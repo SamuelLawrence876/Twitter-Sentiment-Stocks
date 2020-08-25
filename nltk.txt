@@ -1,5 +1,5 @@
 wordnet
 stopwords
-tokenize
+punkt
 WordCloud
 STOPWORDS
