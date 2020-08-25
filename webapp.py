@@ -172,8 +172,8 @@ def app():
                 # plt.figure(figsize=[10, 10])
                 plt.imshow(wc, interpolation="bilinear")
                 plt.axis('off')
-                plt.savefig('wc.jpg')
-                gen = Image.open("WC.jpg")
+                plt.savefig('WC.png')
+                gen = Image.open("WC.png")
                 plt.show()
                 return gen
 
