@@ -126,8 +126,6 @@ def app():
             def gen_wordcloud():
 
                 # Unwanted words from word cloud
-                unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
-                            'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http']
 
                 tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
                     .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
@@ -161,6 +159,10 @@ def app():
                         if w not in stop_words and w.isalpha():
                             filtered.append(w.lower())
                     return filtered
+
+                unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
+                            'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http','the','to','and','is','of',
+                            'in','it','you','for','on','this','will','are','price']
 
                 words_filtered = punctuation_stop(words)
                 text = " ".join([ele for ele in words_filtered if ele not in unwanted])
