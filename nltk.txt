@@ -1,5 +1,5 @@
 wordnet
-corpus
+stopwords
 tokenize
 WordCloud
 STOPWORDS
