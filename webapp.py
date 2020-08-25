@@ -25,7 +25,7 @@ ticker = '$TSLA'
 Stock_Name = 'Tesla Stock'
 since_date = str(week)
 until_date = str(today)
-count = 10
+count = 2000
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
