@@ -1,0 +1,5 @@
+wordnet
+corpus
+tokenize
+WordCloud
+STOPWORDS

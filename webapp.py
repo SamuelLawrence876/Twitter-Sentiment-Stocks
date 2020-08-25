@@ -5,9 +5,9 @@ import pandas as pd
 import GetOldTweets3 as got
 import datetime
 from textblob import TextBlob
-from wordcloud import WordCloud, ImageColorGenerator, STOPWORDS
-from nltk.tokenize import word_tokenize
 from PIL import Image
+from wordcloud import WordCloud, STOPWORDS
+from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 import gensim
