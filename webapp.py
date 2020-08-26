@@ -24,7 +24,7 @@ Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
 since_date = str(week)
 until_date = str(today)
-count = 100
+count = 2000
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
