@@ -21,8 +21,6 @@ yesterday = today - datetime.timedelta(days=1)
 week = today - datetime.timedelta(days=7)
 Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
-ticker = '$TSLA'
-Stock_Name = 'Tesla Stock'
 since_date = str(week)
 until_date = str(today)
 count = 2000
@@ -40,7 +38,7 @@ def app():
 
     st.subheader("Analyze the tweets of your favourite stocks")
 
-    raw_text_U = st.text_area("What stock are we looking up today?")
+    raw_text_U = st.text_area("What stock are we looking up today? - Input stock name not ticker")
     raw_text = raw_text_U + ' stock'
 
     Analyzer_choice = st.selectbox("What would you like to find out?",
@@ -96,7 +94,7 @@ def app():
                 df = df[df.Subjectivity > 0.5]
 
                 # Polarity score
-                score = round(df['Polarity'].mean(),ndigits=3)
+                score = round(df['Polarity'].mean(), ndigits=3)
 
                 # Display Text
                 st.write('The general sentiment for ' + raw_text + "'s was " + str(score) + ' On a scale of 1 to -1')
@@ -118,12 +116,16 @@ def app():
         # Wordcloud generation
         elif Analyzer_choice == "WordCloud Generation":
             st.subheader(' A visual representation of ' + raw_text + ' tweets')
+            #messadge = 'Gathering tweets (this may take awhile)'
 
-            st.success("Generating Image")
+            #st.success(messadge)
 
             # st.write(df['cleanLinks'][1])
 
             def gen_wordcloud():
+
+                messagee = 'Gathering tweets (this may take awhile)'
+                st.success(messagee)
 
                 # Unwanted words from word cloud
 
@@ -150,6 +152,8 @@ def app():
                 # WC generation
                 words = " ".join(df['cleanLinks'])
 
+                messagee = 'Gathering tweets (this may take awhile)'
+
                 def punctuation_stop(text):
                     """remove punctuation and stop words"""
                     filtered = []
@@ -161,8 +165,9 @@ def app():
                     return filtered
 
                 unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
-                            'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http','the','to','and','is','of',
-                            'in','it','you','for','on','this','will','are','price']
+                            'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
+                            'of',
+                            'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones']
 
                 words_filtered = punctuation_stop(words)
                 text = " ".join([ele for ele in words_filtered if ele not in unwanted])
@@ -177,9 +182,11 @@ def app():
                 plt.show()
                 return gen
 
+
             gen = gen_wordcloud()
 
             st.image(gen, use_column_width=True)
+
 
         # Buyers Charts and graphs
         elif Analyzer_choice == "Charts & Graphs of buyer positions":
@@ -340,6 +347,8 @@ def app():
                     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
                     return words_freq[:n]
 
+
+                
                 common_words = get_top_n_words(df['cleanLinks'], 20)
 
                 plt.figure(figsize=(18, 8))
@@ -347,7 +356,7 @@ def app():
 
                 df1 = pd.DataFrame(common_words, columns=['cleanLinks', 'count'])
                 df1.groupby('cleanLinks').sum()['count'].sort_values(ascending=False).plot(
-                    kind='bar', xlabel='',fontsize=12, title='Top 20 words in review before removing stop words')
+                    kind='bar', xlabel='', fontsize=12, title='Top 20 words in review before removing stop words')
                 plt.savefig('top_10.JPEG')
                 top = Image.open("top_10.JPEG")
                 plt.show()
@@ -363,7 +372,6 @@ def app():
              'very important to do your own analysis before making any investment based on your own personal '
              'circumstances.')
     st.write('Github repo: https://github.com/SamuelLawrence876/Twitter-Sentiment')
-
 
 
 if __name__ == "__main__":
