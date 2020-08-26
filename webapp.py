@@ -24,7 +24,7 @@ Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
 since_date = str(week)
 until_date = str(today)
-count = 2000
+count = 100
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
@@ -40,8 +40,9 @@ def app():
 
     st.subheader("Analyze the tweets of your favourite stocks")
 
-    raw_text_U = st.text_area("What stock are we looking up today? - Input stock name not ticker")
-    raw_text = raw_text_U + ' stock'
+    raw_text_U = st.text_area("What stock are we looking up today? - ticket symbol")
+    raw_text = '$' + raw_text_U
+    #raw_text = raw_text_U + ' stock'
 
     Analyzer_choice = st.selectbox("What would you like to find out?",
                                    ["Stock Sentiment", "WordCloud Generation",
@@ -110,11 +111,9 @@ def app():
                     st.markdown('This reflects a **negative** sentiment')
 
                 st.write('Graphs of sentiment:')
-                st.bar_chart(df['Polarity'])
 
-                # Graphs
+                st.area_chart(df['Polarity'])
 
-                # st.write(df['cleanLinks'][1])
                 return df
 
             Show_Recent_Tweets(raw_text)
@@ -122,9 +121,9 @@ def app():
         # Wordcloud generation
         elif Analyzer_choice == "WordCloud Generation":
             st.subheader(' A visual representation of ' + raw_text + ' tweets')
-            messadge = 'Generating WordCloud (this may take awhile)'
+            message2 = 'Generating WordCloud'
 
-            st.success(messadge)
+            st.success(message2)
 
             # st.write(df['cleanLinks'][1])
 
@@ -245,7 +244,6 @@ def app():
 
                 # Graph numbers
                 position_A = df['Market Polar Position'].value_counts()
-                position_B = df['Market Polar Position'].value_counts()
                 st.write(position_A)
 
                 # Graph
@@ -344,7 +342,7 @@ def app():
 
 
                 # unwanted word list
-                unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
+                unwanted = [raw_text,raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
                             'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
                             'of',
                             'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones']
@@ -370,7 +368,7 @@ def app():
 
                 df1 = pd.DataFrame(common_words, columns=['cleanLinks', 'count'])
                 df1.groupby('cleanLinks').sum()['count'].sort_values(ascending=False).plot(
-                    kind='bar', xlabel='', rot=30 ,fontsize=12, title='Top 20 words from tweets')
+                    kind='bar', xlabel='', rot=30 ,fontsize=12)
                 plt.savefig('top_10.JPEG')
                 top = Image.open("top_10.JPEG")
                 plt.show()
@@ -379,7 +377,7 @@ def app():
             top = top_words()
 
             st.image(top, use_column_width=True, width=100000,
-                     caption='The Top 30 most frequent words in ' + raw_text + ' tweets\n')
+                     caption='The Top 20 most frequent words in ' + raw_text + ' tweets\n')
 
     st.subheader('Author: Samuel Lawrence ')
     st.write('Disclaimer: This content is intended to be used and must be used for informational purposes only. It is '
