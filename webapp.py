@@ -15,6 +15,7 @@ from gensim import corpora
 import string
 from sklearn.feature_extraction.text import CountVectorizer
 from yellowbrick.style import set_palette
+from gensim.parsing.preprocessing import remove_stopwords
 
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
@@ -27,6 +28,7 @@ count = 2000
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
+
 
 
 # Location = 'London, United Kingdom'
@@ -97,13 +99,17 @@ def app():
                 score = round(df['Polarity'].mean(), ndigits=3)
 
                 # Display Text
+
+                sample_tweet = df['cleanLinks'].iloc[0]
+                st.markdown('**Sample Tweet: **' + sample_tweet)
+
                 st.write('The general sentiment for ' + raw_text + "'s was " + str(score) + ' On a scale of 1 to -1')
                 if score > 0:
-                    st.write('This reflects a positive sentiment')
+                    st.markdown('This reflects a **positive** sentiment')
                 else:
-                    st.write('This reflects a negative sentiment')
+                    st.markdown('This reflects a **negative** sentiment')
 
-                st.write('Graphs of sentiment')
+                st.write('Graphs of sentiment:')
                 st.bar_chart(df['Polarity'])
 
                 # Graphs
@@ -116,16 +122,13 @@ def app():
         # Wordcloud generation
         elif Analyzer_choice == "WordCloud Generation":
             st.subheader(' A visual representation of ' + raw_text + ' tweets')
-            #messadge = 'Gathering tweets (this may take awhile)'
+            messadge = 'Generating WordCloud (this may take awhile)'
 
-            #st.success(messadge)
+            st.success(messadge)
 
             # st.write(df['cleanLinks'][1])
 
             def gen_wordcloud():
-
-                messagee = 'Gathering tweets (this may take awhile)'
-                st.success(messagee)
 
                 # Unwanted words from word cloud
 
@@ -335,9 +338,16 @@ def app():
 
                 for char1 in spec_chars1:
                     df['cleanLinks'] = df['cleanLinks'].str.replace(char1, ' ')
+                    text = df.cleanLinks.str.cat(sep=' ')
+                    filtered_sentence = remove_stopwords(text)
 
+
+                # unwanted word list
+                unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
+                            'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
+                            'of',
+                            'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones']
                 # vectorized text
-                # vectorizing text
 
                 def get_top_n_words(corpus, n=None):
                     vec = CountVectorizer().fit(corpus)
@@ -347,16 +357,19 @@ def app():
                     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
                     return words_freq[:n]
 
+                text = df.cleanLinks.str.cat(sep=' ')
+                filtered_sentence = remove_stopwords(text)
+                texa = {'texz': [filtered_sentence]}
+                dfz = pd.DataFrame(data=texa)
 
-                
-                common_words = get_top_n_words(df['cleanLinks'], 20)
+                common_words = get_top_n_words(dfz['texz'], 20)
 
                 plt.figure(figsize=(18, 8))
                 plt.rc('xtick', labelsize=15)
 
                 df1 = pd.DataFrame(common_words, columns=['cleanLinks', 'count'])
                 df1.groupby('cleanLinks').sum()['count'].sort_values(ascending=False).plot(
-                    kind='bar', xlabel='', fontsize=12, title='Top 20 words in review before removing stop words')
+                    kind='bar', xlabel='', rot=30 ,fontsize=12, title='Top 20 words from tweets')
                 plt.savefig('top_10.JPEG')
                 top = Image.open("top_10.JPEG")
                 plt.show()
