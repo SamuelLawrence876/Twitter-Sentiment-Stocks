@@ -170,7 +170,8 @@ def app():
                 unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
                             'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
                             'of',
-                            'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones']
+                            'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones',
+                            'robinhood','link','http','dow','jones','order','//','sign','join','claim']
 
                 words_filtered = punctuation_stop(words)
                 text = " ".join([ele for ele in words_filtered if ele not in unwanted])
