@@ -40,7 +40,7 @@ def app():
 
     st.subheader("Analyze the tweets of your favourite stocks")
 
-    raw_text_U = st.text_area("What stock are we looking up today? - ticket symbol")
+    raw_text_U = st.text_area("What stock are we looking up today? - ticker symbol")
     raw_text = '$' + raw_text_U
     #raw_text = raw_text_U + ' stock'
 
@@ -243,6 +243,7 @@ def app():
                 df['Market Polar Position'] = df['cleanLinks'].apply(Wordcount)
 
                 # Graph numbers
+                st.markdown('Visualization of investor positions:')
                 position_A = df['Market Polar Position'].value_counts()
                 st.write(position_A)
 
@@ -259,8 +260,8 @@ def app():
 
         # Gensim Stock Theme
         elif Analyzer_choice == "Stock Theme":
-            st.subheader('the following represents AI Generated Topic modeling for ' + raw_text)
-            st.success("Constructing Theme from tweets")
+            st.subheader('the following represents AI Generated topic modeling for ' + raw_text)
+            st.success("Constructing theme from tweets")
 
             tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
                 .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
