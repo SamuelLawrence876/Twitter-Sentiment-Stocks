@@ -1,3 +1,4 @@
+
 import streamlit as st
 import re
 import matplotlib.pyplot as plt
@@ -24,11 +25,10 @@ Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
 since_date = str(week)
 until_date = str(today)
-count = 2000
+count = 500
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
-
 
 
 # Location = 'London, United Kingdom'
@@ -42,7 +42,8 @@ def app():
 
     raw_text_U = st.text_area("What stock are we looking up today? - ticker symbol")
     raw_text = '$' + raw_text_U
-    #raw_text = raw_text_U + ' stock'
+    raw_text.lower()
+    # raw_text = raw_text_U + ' stock'
 
     Analyzer_choice = st.selectbox("What would you like to find out?",
                                    ["Stock Sentiment", "WordCloud Generation",
@@ -104,7 +105,7 @@ def app():
                 sample_tweet = df['cleanLinks'].iloc[0]
                 st.markdown('**Sample Tweet: **' + sample_tweet)
 
-                st.write('The general sentiment for ' + raw_text + "'s was " + str(score) + ' On a scale of 1 to -1')
+                st.write('The general sentiment for ' + raw_text + " was " + str(score) + ' On a scale of 1 to -1')
                 if score > 0:
                     st.markdown('This reflects a **positive** sentiment')
                 else:
@@ -116,16 +117,18 @@ def app():
 
                 return df
 
-            Show_Recent_Tweets(raw_text)
+            try:
+                Show_Recent_Tweets(raw_text)
+            except IndexError:
+                st.error('**Not enough tweets found to generate sentiment**')
 
         # Wordcloud generation
         elif Analyzer_choice == "WordCloud Generation":
             st.subheader(' A visual representation of ' + raw_text + ' tweets')
-            message2 = 'Generating WordCloud'
 
-            st.success(message2)
+            message = 'Generating WordCloud'
 
-            # st.write(df['cleanLinks'][1])
+            st.success(message)
 
             def gen_wordcloud():
 
@@ -170,25 +173,28 @@ def app():
                             'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
                             'of',
                             'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones',
-                            'robinhood','link','http','dow','jones','order','//','sign','join','claim']
+                            'robinhood', 'link', 'http', 'dow', 'jones', 'order', '//', 'sign', 'join', 'claim']
+                try:
+                    words_filtered = punctuation_stop(words)
+                    text = " ".join([ele for ele in words_filtered if ele not in unwanted])
+                    wc = WordCloud(background_color="gray", stopwords=STOPWORDS, max_words=500, width=2000,
+                                   height=2000)
+                    wc.generate(text)
+                    plt.imshow(wc, interpolation="bilinear")
+                    plt.axis('off')
+                    plt.savefig('WC.png')
+                    gen = Image.open("WC.png")
+                    plt.show()
+                    return gen
 
-                words_filtered = punctuation_stop(words)
-                text = " ".join([ele for ele in words_filtered if ele not in unwanted])
-                wc = WordCloud(background_color="gray", stopwords=STOPWORDS, max_words=500, width=2000,
-                               height=2000)
-                wc.generate(text)
-                # plt.figure(figsize=[10, 10])
-                plt.imshow(wc, interpolation="bilinear")
-                plt.axis('off')
-                plt.savefig('WC.png')
-                gen = Image.open("WC.png")
-                plt.show()
-                return gen
+                except ValueError:
+                    st.error('**Not enough tweets found to build wordcloud**')
+            try:
+                gen = gen_wordcloud()
 
-
-            gen = gen_wordcloud()
-
-            st.image(gen, use_column_width=True)
+                st.image(gen, use_column_width=True)
+            except AttributeError:
+                pass
 
 
         # Buyers Charts and graphs
@@ -248,7 +254,8 @@ def app():
                 st.write(position_A)
 
                 # Graph
-                df['Market Polar Position'].value_counts().plot(kind='pie', ylabel='', autopct='%1.1f%%',
+                plt.axis('off')
+                df['Market Polar Position'].value_counts().plot(kind='pie', autopct='%1.1f%%',
                                                                 figsize=(10, 5))
                 plt.savefig('buyers.png')
                 buy = Image.open("buyers.png")
@@ -301,16 +308,19 @@ def app():
             corpus = [dictionary.doc2bow(text) for text in doc_clean]
 
             # let LDA find 3 topics
-            ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=3, id2word=dictionary, passes=15)
+            try:
+                ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=3, id2word=dictionary, passes=15)
 
-            x = ldamodel.show_topics()
+                x = ldamodel.show_topics()
 
-            twords = {}
-            for topic, word in x:
-                twords[topic] = re.sub('[^A-Za-z ]+', '', word)
-            st.write('Topic 1 generated: ' + twords[0])
-            st.write('Topic 2 generated: ' + twords[1])
-            st.write('Topic 3 generated: ' + twords[2])
+                twords = {}
+                for topic, word in x:
+                    twords[topic] = re.sub('[^A-Za-z ]+', '', word)
+                st.write('Topic 1 generated: ' + twords[0])
+                st.write('Topic 2 generated: ' + twords[1])
+                st.write('Topic 3 generated: ' + twords[2])
+            except ValueError:
+                st.error('**Not enough tweets found to generate word count**')
         # Top word count theme
         else:
             # Top Words mentioned from the stock
@@ -327,8 +337,8 @@ def app():
 
                 # Create Dataframe with just tweets
                 df = pd.DataFrame(data=posts, columns=['Tweet'])
-                df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
-                df['cleanLinks'] = df['cleanLinks'].apply(lambda x: x.lower())  # applying lowercase to text
+                df['Tweets'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
+                df['Tweets'] = df['Tweets'].apply(lambda x: x.lower())  # applying lowercase to text
 
                 # Special Character list
                 spec_chars1 = ["!", '"', "#", "%", "&", "'", "(", ")",
@@ -337,16 +347,16 @@ def app():
                                "`", "{", "|", "}", "~", "–", '$']
 
                 for char1 in spec_chars1:
-                    df['cleanLinks'] = df['cleanLinks'].str.replace(char1, ' ')
-                    text = df.cleanLinks.str.cat(sep=' ')
+                    df['Tweets'] = df['Tweets'].str.replace(char1, ' ')
+                    text = df.Tweets.str.cat(sep=' ')
                     filtered_sentence = remove_stopwords(text)
 
-
                 # unwanted word list
-                unwanted = [raw_text,raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
+                unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
                             'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and', 'is',
                             'of',
                             'in', 'it', 'you', 'for', 'on', 'this', 'will', 'are', 'price', 'dow', 'jones']
+
                 # vectorized text
 
                 def get_top_n_words(corpus, n=None):
@@ -357,7 +367,7 @@ def app():
                     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
                     return words_freq[:n]
 
-                text = df.cleanLinks.str.cat(sep=' ')
+                text = df.Tweets.str.cat(sep=' ')
                 filtered_sentence = remove_stopwords(text)
                 texa = {'texz': [filtered_sentence]}
                 dfz = pd.DataFrame(data=texa)
@@ -367,18 +377,21 @@ def app():
                 plt.figure(figsize=(18, 8))
                 plt.rc('xtick', labelsize=15)
 
-                df1 = pd.DataFrame(common_words, columns=['cleanLinks', 'count'])
-                df1.groupby('cleanLinks').sum()['count'].sort_values(ascending=False).plot(
-                    kind='bar', xlabel='', rot=30 ,fontsize=12)
+                df1 = pd.DataFrame(common_words, columns=['Tweets', 'count'])
+                #plt.xaxis('off')
+                df1.groupby('Tweets').sum()['count'].sort_values(ascending=False).plot(
+                    kind='bar', rot=30, fontsize=12)
                 plt.savefig('top_10.JPEG')
                 top = Image.open("top_10.JPEG")
                 plt.show()
                 return top
+            try:
+                top = top_words()
 
-            top = top_words()
-
-            st.image(top, use_column_width=True, width=100000,
-                     caption='The Top 20 most frequent words in ' + raw_text + ' tweets\n')
+                st.image(top, use_column_width=True, width=100000,
+                         caption='The Top 20 most frequent words in ' + raw_text + ' tweets\n')
+            except ValueError:
+                st.error('**Not enough tweets found to generate word count**')
 
     st.subheader('Author: Samuel Lawrence ')
     st.write('Disclaimer: This content is intended to be used and must be used for informational purposes only. It is '
