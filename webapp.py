@@ -25,7 +25,7 @@ Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
 since_date = str(week)
 until_date = str(today)
-count = 500
+count = 1000
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
@@ -40,8 +40,9 @@ def app():
 
     st.subheader("Analyze the tweets of your favourite stocks")
 
-    raw_text_U = st.text_area("What stock are we looking up today? - ticker symbol")
-    raw_text = '$' + raw_text_U
+    raw_text_U = st.text_area("What stock are we looking up today? - eg. tesla, facebook, apple")
+    #raw_text = '$' + raw_text_U # <-- Search Stock Based on Ticker
+    raw_text = raw_text_U + ' stock'
     raw_text.lower()
     # raw_text = raw_text_U + ' stock'
 
@@ -111,7 +112,7 @@ def app():
                 else:
                     st.markdown('This reflects a **negative** sentiment')
 
-                st.write('Graphs of sentiment:')
+                st.markdown('**Graphs of sentiment over time:**')
 
                 st.area_chart(df['Polarity'])
 
