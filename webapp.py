@@ -25,7 +25,7 @@ Three_Days = datetime.timedelta(days=3)
 Yfinacne_ticker = 'TSLA'
 since_date = str(week)
 until_date = str(today)
-count = 1000
+count = 10
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
@@ -106,7 +106,7 @@ def app():
                 sample_tweet = df['cleanLinks'].iloc[0]
                 st.markdown('**Sample Tweet: **' + sample_tweet)
 
-                st.write('The general sentiment for ' + raw_text + " was " + str(score) + ' On a scale of 1 to -1')
+                st.write('The general sentiment for ' + raw_text_U + "'s stock was " + str(score) + ' On a scale of 1 to -1')
                 if score > 0:
                     st.markdown('This reflects a **positive** sentiment')
                 else:
@@ -125,7 +125,7 @@ def app():
 
         # Wordcloud generation
         elif Analyzer_choice == "WordCloud Generation":
-            st.subheader(' A visual representation of ' + raw_text + ' tweets')
+            st.subheader(' A visual representation of ' + raw_text_U + "'s tweets")
 
             message = 'Generating WordCloud'
 
@@ -250,7 +250,7 @@ def app():
                 df['Market Polar Position'] = df['cleanLinks'].apply(Wordcount)
 
                 # Graph numbers
-                st.markdown('Visualization of investor positions:')
+                st.markdown('**Visualization of investor positions:**')
                 position_A = df['Market Polar Position'].value_counts()
                 st.write(position_A)
 
@@ -268,7 +268,7 @@ def app():
 
         # Gensim Stock Theme
         elif Analyzer_choice == "Stock Theme":
-            st.subheader('the following represents AI Generated topic modeling for ' + raw_text)
+            st.subheader('the following represents an AI Generated topic model for ' + raw_text_U + "'s stock")
             st.success("Constructing theme from tweets")
 
             tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
@@ -326,7 +326,7 @@ def app():
         else:
             # Top Words mentioned from the stock
             def top_words():
-                st.subheader("The top words mentioned in " + raw_text + " tweets:")
+                st.subheader("The top words mentioned in " + raw_text_U + " tweets:")
                 st.success("Processing Word Count")
 
                 tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
