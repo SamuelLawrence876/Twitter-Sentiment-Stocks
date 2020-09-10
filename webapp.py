@@ -398,7 +398,7 @@ def app():
     st.write('Disclaimer: This content is intended to be used and must be used for informational purposes only. It is '
              'very important to do your own analysis before making any investment based on your own personal '
              'circumstances.')
-    st.write('Github repo: https://github.com/SamuelLawrence876/Twitter-Sentiment')
+    st.write('Github repo: https://github.com/SamuelLawrence876/Twitter-Sentiment-Stocks-deployment')
 
 
 if __name__ == "__main__":
