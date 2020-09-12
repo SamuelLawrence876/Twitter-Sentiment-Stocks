@@ -32,7 +32,7 @@ def app():
     st.subheader("Analyze the tweets of your favourite stocks")
 
     raw_text_U = st.text_area("What stock are we looking up today? - eg. tesla, facebook, apple")
-    count = st.slider("How many tweet's would you like to pull)", min_value=500, max_value=3000, step=100)
+    count = st.slider("How many tweet's would you like to pull", min_value=500, max_value=3000, step=100)
     try:
         Start_date = st.date_input("Date range of tweets", [])
 
