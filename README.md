@@ -1,5 +1,8 @@
 # **A Stock Market sentiment analyzer based on twitter data using nlp**
 #### -- Project Status: [Complete]
+
+## Project deployed at: https://twitter-sentiment-stocks.herokuapp.com/ via streamlit
+
 #### Project phases:
 - [x] [curate tweets]
 - [x] [Perform data cleaning]
