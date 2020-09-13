@@ -17,7 +17,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from yellowbrick.style import set_palette
 from gensim.parsing.preprocessing import remove_stopwords
 
-# count = 1000
+
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
@@ -26,11 +26,13 @@ set_palette('flatui')
 # Location = 'London, United Kingdom'
 # Distance = '200mi'
 
+#App Start
 def app():
     st.title("Stock Tweet Analyzer 📈")
 
     st.subheader("Analyze the tweets of your favourite stocks")
 
+    # User Input Section area
     raw_text_U = st.text_area("What stock are we looking up today? - eg. tesla, facebook, apple")
     count = st.slider("How many tweet's would you like to pull", min_value=500, max_value=3000, step=100)
     try:
@@ -43,17 +45,19 @@ def app():
 
     # raw_text = '$' + raw_text_U # <-- Search Stock Based on Ticker
     raw_text = raw_text_U + ' stock'
-    raw_text.lower()
+    raw_text = raw_text.lower()
     # raw_text = raw_text_U + ' stock'
 
+    # Choice Box selection
     Analyzer_choice = st.selectbox("What would you like to find out?",
                                    ["Stock Sentiment", "WordCloud Generation",
                                     "Top 10 Words associated with the stock", "Stock Theme",
                                     "Charts & Graphs of buyer positions"])
     try:
         try:
-            if st.button("Analyze"):
+            if st.button("Analyze"): #Button
 
+                # Sentiment Area Start
                 if Analyzer_choice == "Stock Sentiment":
                     st.subheader(
                         'This stock sentiment Analyzer uses NLP based technology to interpret and classify emotions '
@@ -61,6 +65,8 @@ def app():
                     my_placeholder = st.empty()
                     message = "Fetching Tweets"
                     st.success(message)
+
+                    # Function for getting tweets
 
                     def Show_Recent_Tweets(raw_text):
                         # Collecting tweets for Dataframe
@@ -71,14 +77,14 @@ def app():
 
                         posts = [[tweet.text] for tweet in tweets]
 
-                        # Create Dataframe with just tweets
+                        # Create Dataframe with tweets
                         df = pd.DataFrame(data=posts, columns=['Tweet'])
 
                         # Cleaning Tweets
                         df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
                         df['cleanLinks'] = df['cleanLinks'].apply(lambda x: x.lower())  # applying lowercase to text
 
-                        # Special Charachter list
+                        # Special Character list
                         spec_chars = ["!", '"', "#", "%", "&", "'", "(", ")",
                                       "*", "+", ",", "-", ".", "/", ":", ";", "<",
                                       "=", ">", "?", "@", "[", "\\", "]", "^", "_",
@@ -138,9 +144,10 @@ def app():
 
                     st.success(message)
 
+                    # Create Word Cloud
                     def gen_wordcloud():
 
-                        # Unwanted words from word cloud
+                        # Pulling Tweets
 
                         tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
                             .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
@@ -165,10 +172,9 @@ def app():
                         # WC generation
                         words = " ".join(df['cleanLinks'])
 
-                        messagee = 'Gathering tweets (this may take awhile)'
-
+                        # remove punctuation and stop words
                         def punctuation_stop(text):
-                            """remove punctuation and stop words"""
+
                             filtered = []
                             stop_words = set(stopwords.words('english'))
                             word_tokens = word_tokenize(text)
@@ -317,7 +323,7 @@ def app():
                     dictionary = corpora.Dictionary(doc_clean)
                     corpus = [dictionary.doc2bow(text) for text in doc_clean]
 
-                    # let LDA find 3 topics
+                    # LDA Model
                     try:
                         ldamodel = gensim.models.ldamodel.LdaModel(corpus, num_topics=3, id2word=dictionary, passes=15)
 
@@ -326,6 +332,7 @@ def app():
                         twords = {}
                         for topic, word in x:
                             twords[topic] = re.sub('[^A-Za-z ]+', '', word)
+                            # Create 3 topics
                         st.write('Topic 1 generated: ' + twords[0])
                         st.write('Topic 2 generated: ' + twords[1])
                         st.write('Topic 3 generated: ' + twords[2])
@@ -361,7 +368,7 @@ def app():
                             text = df.Tweets.str.cat(sep=' ')
                             filtered_sentence = remove_stopwords(text)
 
-                        # unwanted word list
+                        # unwanted word list (Experimental)
                         unwanted = [raw_text, raw_text_U, 'market', 'moving', 'average', 'economy', 'stockmarket',
                                     'stocks', 'stock', 'people', 'money', 'markets', 'today', 'http', 'the', 'to', 'and',
                                     'is',
@@ -405,12 +412,15 @@ def app():
                     except ValueError:
                         st.error('**Not enough tweets found to generate word count**')
 
+            # Credits
             st.subheader('Author: Samuel Lawrence ')
             st.write(
                 'Disclaimer: This content is intended to be used and must be used for informational purposes only. It is '
                 'very important to do your own analysis before making any investment based on your own personal '
                 'circumstances.')
             st.write('Github repo: https://github.com/SamuelLawrence876/Twitter-Sentiment-Stocks-deployment')
+
+            # Error Exceptions
         except NameError:
             st.error("Please enter a range")
     except SystemExit:
