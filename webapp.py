@@ -55,7 +55,7 @@ def app():
                                     "Charts & Graphs of buyer positions"])
     try:
         try:
-            if st.button("Analyze"): #Button
+            if st.button("Analyze"): # Button
 
                 # Sentiment Area Start
                 if Analyzer_choice == "Stock Sentiment":
