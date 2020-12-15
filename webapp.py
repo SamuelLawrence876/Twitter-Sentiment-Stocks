@@ -2,7 +2,6 @@ import streamlit as st
 import re
 import matplotlib.pyplot as plt
 import pandas as pd
-import GetOldTweets3 as got
 import datetime
 from textblob import TextBlob
 from PIL import Image
@@ -16,7 +15,11 @@ import string
 from sklearn.feature_extraction.text import CountVectorizer
 from yellowbrick.style import set_palette
 from gensim.parsing.preprocessing import remove_stopwords
-
+import snscrape.modules.twitter as sntwitter
+import nltk
+nltk.download("stopwords")
+nltk.download('punkt')
+nltk.download('wordnet')
 
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
@@ -30,7 +33,7 @@ set_palette('flatui')
 def app():
     st.title("Stock Tweet Analyzer 📈")
 
-    st.subheader("Analyze the tweets of your favourite stocks")
+    st.subheader("Analyze the tweets of your favorite stocks")
 
     # User Input Section area
     raw_text_U = st.text_area("What stock are we looking up today? - eg. tesla, facebook, apple")
@@ -69,16 +72,16 @@ def app():
                     # Function for getting tweets
 
                     def Show_Recent_Tweets(raw_text):
-                        # Collecting tweets for Dataframe
-                        tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
-                            .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
+                    #     # Collecting tweets for Dataframe
+                    
+                        tweets_list2 = []
 
-                        tweets = got.manager.TweetManager.getTweets(tweetCriteria1)
-
-                        posts = [[tweet.text] for tweet in tweets]
-
-                        # Create Dataframe with tweets
-                        df = pd.DataFrame(data=posts, columns=['Tweet'])
+                        for i,tweet in enumerate(sntwitter.TwitterSearchScraper(raw_text + ' since:' + since_date +' until:' + until_date).get_items()):
+                            if i>count:
+                                break
+                            tweets_list2.append([tweet.content])
+                        
+                        df = pd.DataFrame(tweets_list2, columns=['Tweet'])
 
                         # Cleaning Tweets
                         df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
@@ -147,17 +150,15 @@ def app():
                     # Create Word Cloud
                     def gen_wordcloud():
 
-                        # Pulling Tweets
+                        tweets_list2 = []
 
-                        tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
-                            .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
+                        for i,tweet in enumerate(sntwitter.TwitterSearchScraper(raw_text + ' since:' + since_date +' until:' + until_date).get_items()):
+                            if i>count:
+                                break
+                            tweets_list2.append([tweet.content])
+                        
+                        df = pd.DataFrame(tweets_list2, columns=['Tweet'])
 
-                        tweets = got.manager.TweetManager.getTweets(tweetCriteria1)
-
-                        posts = [[tweet.text] for tweet in tweets]
-
-                        # Create Dataframe with just tweets
-                        df = pd.DataFrame(data=posts, columns=['Tweet'])
                         df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
                         df['cleanLinks'] = df['cleanLinks'].apply(lambda x: x.lower())  # applying lowercase to text
 
@@ -220,15 +221,16 @@ def app():
 
                     def graphs():
 
-                        tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
-                            .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
+                        tweets_list2 = []
 
-                        tweets = got.manager.TweetManager.getTweets(tweetCriteria1)
-
-                        posts = [[tweet.text] for tweet in tweets]
+                        for i,tweet in enumerate(sntwitter.TwitterSearchScraper(raw_text + ' since:' + since_date +' until:' + until_date).get_items()):
+                            if i>count:
+                                break
+                            tweets_list2.append([tweet.content])
+                        
+                        df = pd.DataFrame(tweets_list2, columns=['Tweet'])
 
                         # Create Dataframe with just tweets
-                        df = pd.DataFrame(data=posts, columns=['Tweet'])
                         df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
                         df['cleanLinks'] = df['cleanLinks'].apply(lambda x: x.lower())  # applying lowercase to text
 
@@ -285,16 +287,17 @@ def app():
                 elif Analyzer_choice == "Stock Theme":
                     st.subheader('the following represents an AI Generated topic model for ' + raw_text_U + "'s stock")
                     st.success("Constructing theme from tweets")
+                    
+                    tweets_list2 = []
 
-                    tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
-                        .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
-
-                    tweets = got.manager.TweetManager.getTweets(tweetCriteria1)
-
-                    posts = [[tweet.text] for tweet in tweets]
+                    for i,tweet in enumerate(sntwitter.TwitterSearchScraper(raw_text + ' since:' + since_date +' until:' + until_date).get_items()):
+                        if i>count:
+                            break
+                        tweets_list2.append([tweet.content])
+                    
+                    df = pd.DataFrame(tweets_list2, columns=['Tweet'])
 
                     # Create Dataframe with just tweets
-                    df = pd.DataFrame(data=posts, columns=['Tweet'])
                     df['cleanLinks'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
                     df['cleanLinks'] = df['cleanLinks'].apply(lambda x: x.lower())  # applying lowercase to text
 
@@ -344,16 +347,17 @@ def app():
                     def top_words():
                         st.subheader("The top words mentioned in " + raw_text_U + " tweets:")
                         st.success("Processing Word Count")
-
-                        tweetCriteria1 = got.manager.TweetCriteria().setQuerySearch(raw_text) \
-                            .setSince(since_date).setUntil(until_date).setMaxTweets(count).setLang('en')
-
-                        tweets = got.manager.TweetManager.getTweets(tweetCriteria1)
-
-                        posts = [[tweet.text] for tweet in tweets]
+                        
+                        tweets_list2 = []
+                        
+                        for i,tweet in enumerate(sntwitter.TwitterSearchScraper(raw_text + ' since:' + since_date +' until:' + until_date).get_items()):
+                            if i>count:
+                                break
+                            tweets_list2.append([tweet.content])
+                        
+                        df = pd.DataFrame(tweets_list2, columns=['Tweet'])
 
                         # Create Dataframe with just tweets
-                        df = pd.DataFrame(data=posts, columns=['Tweet'])
                         df['Tweets'] = df['Tweet'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])  # Removing URLs
                         df['Tweets'] = df['Tweets'].apply(lambda x: x.lower())  # applying lowercase to text
 
