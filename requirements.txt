@@ -100,3 +100,4 @@ wordcloud==1.8.0
 yellowbrick==1.1
 zipp==3.1.0
 zope.interface==5.1.0
+snscrape
