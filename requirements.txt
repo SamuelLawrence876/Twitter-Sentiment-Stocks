@@ -15,4 +15,4 @@ tqdm
 wordcloud
 yellowbrick
 # snscrape
--e git+https://github.com/JustAnotherArchivist/snscrape.git
+-e git+https://github.com/JustAnotherArchivist/snscrape.git#egg=snscrape
