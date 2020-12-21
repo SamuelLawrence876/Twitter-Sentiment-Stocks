@@ -24,11 +24,7 @@ nltk.download('wordnet')
 plt.rcParams['figure.figsize'] = (20.0, 20.0)
 plt.rc('font', size=16)
 set_palette('flatui')
-st.markdown("""
-            <meta name="image" content="https://samuel-lawrence.co.uk/images/cool.png">
-            <meta name="image" content="https://samuel-lawrence.co.uk/images/cool.png">
-            <meta property="og:image" content="https://samuel-lawrence.co.uk/images/cool.png">
-            """, unsafe_allow_html=True)
+st.markdown("<meta name='image' property='og:image' content='cool.jpg'>", unsafe_allow_html=True)
 
 # Location = 'London, United Kingdom'
 # Distance = '200mi'
