@@ -34,6 +34,11 @@ def app():
     st.title("Stock Tweet Analyzer 📈")
 
     st.subheader("Analyze the tweets of your favorite stocks")
+    
+    st.subheader("Watch me first!")
+    video_file = open("apiUpdateVideo.webm","rb")
+    video_bytes = video_file.read()
+    st.video(video_bytes)
 
     # User Input Section area
     raw_text_U = st.text_area("What stock are we looking up today? - eg. tesla, facebook, apple")
